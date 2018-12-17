@@ -1,0 +1,28 @@
+<core:FragmentDefinition
+	controllerName="testwebapptestWebApp.controller.EditView1"
+	xmlns="sap.m"
+	xmlns:core="sap.ui.core"
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns:l="sap.ui.layout">
+	<Dialog id="editDialog" title="{i18n>editFragmentTitle}" class="sapUiResponsiveMargin">
+		<l:Grid defaultSpan="L8 M10 S12">
+			<VBox>
+				<layoutData>
+					<l:GridData indent="L2 M2 S1"/>
+				</layoutData>
+				<Label text="Edit Title"/>
+				<Input value="{fragModel>/title}" submit="editSaveFocus"/>
+				<Label text="Edit Description"/>
+				<Input value="{fragModel>/description}" submit="editSaveFocus"/>
+				<Label text="Edit Due Date"/>
+				<DatePicker value="{fragModel>/date}" change="editSaveFocus"/>
+			</VBox>
+		</l:Grid>
+		<beginButton>
+			<Button id="editSave" text="Save" press="onPressSaveDialog"/>
+		</beginButton>
+		<endButton>
+			<Button text="Close" press="onPressCloseDialog"/>
+		</endButton>
+	</Dialog>
+</core:FragmentDefinition>

@@ -1,0 +1,79 @@
+<mvc:View controllerName="testwebapptestWebApp.controller.View1" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:mvc="sap.ui.core.mvc"
+	displayBlock="true" xmlns="sap.m" xmlns:l="sap.ui.layout" xmlns:core="sap.ui.core">
+	<App>
+		<pages>
+			<Page title="{i18n>title}"><content>
+				<l:Grid defaultSpan="L4 M6 S12">
+					<HBox>
+						<layoutData>
+							<l:GridData indent="L4 M2 S1"/>
+						</layoutData>
+						<Table width="100%">
+							<columns vAlign="middle">
+								<Column>
+									<Text text="Task"/>
+								</Column>
+								<Column>
+									<Text text="Due Date"/>
+								</Column>
+								<Column>
+									<Text text=""/>
+								</Column>
+							</columns>
+							<items>
+								<ColumnListItem>
+									<cells>
+										<Input id="inputBox" value="{/results/title}" submit="onPressAdd"/>
+										<DatePicker id="dateBox" dateValue="{/results/date}"/>
+										<Button text="Add" press="onPressAdd"/>
+									</cells>
+								</ColumnListItem>
+							</items>
+						</Table>
+						</HBox>
+						<HBox>
+							<layoutData>
+							<l:GridData span="L12 M12 S12"/>
+						</layoutData>
+						<Table items="{myService/ToDoListSet}" width="auto">
+							<headerToolbar>
+								<Toolbar>
+									<Text text="To Do List"/>
+								</Toolbar>
+							</headerToolbar>
+							<columns>
+								<Column>
+									<Text text="Title"/>
+								</Column>
+								<Column>
+									<Text text="Description"/>
+								</Column>
+								<Column>
+									<Text text="Due Date"/>
+								</Column>
+								<Column/>
+								<Column/>
+							</columns>
+							<items>
+								<ColumnListItem>
+									<cells>
+										<Text text="{Title}"/>
+										<Text text="{description}"/>
+										<Text text="{Duedate}"/>
+										<Button 
+												id="editButton"
+												text="Edit" 
+												press="onPressEdit" 
+												class="sapUiSmallMarginEnd"/>
+										<Button text="Remove" press="onPressRemove"/>
+									</cells>
+								</ColumnListItem>
+							</items>
+						</Table>
+					</HBox>
+				</l:Grid></content>
+			</Page>
+		</pages>
+		
+	</App>
+</mvc:View>
