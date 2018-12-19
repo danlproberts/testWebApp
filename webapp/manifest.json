@@ -73,13 +73,17 @@
 					"bundleName": "testwebapptestWebApp.i18n.i18n"
 				}
 			},
-			"myService": {
+			"": {
 				"dataSource": "myService",
 				"settings": {
 					"defaultCountMode": "None",
 					"useBatch": false,
 					"defaultUpdateMethod": "Put"
 				}
+			}			,
+			"dataStore": {
+				"type": "sap.ui.model.json.JSONModel",
+				"uri": "config/dataStore.json"
 			}
 		},
 		"resources": {

@@ -2,7 +2,7 @@
 	displayBlock="true" xmlns="sap.m" xmlns:l="sap.ui.layout" xmlns:core="sap.ui.core">
 	<App>
 		<pages>
-			<Page title="{i18n>title}"><content>
+			<Page title="{dataStore>/Listname}'s {i18n>title}"><content>
 				<l:Grid defaultSpan="L4 M6 S12">
 					<HBox>
 						<layoutData>
@@ -23,9 +23,9 @@
 							<items>
 								<ColumnListItem>
 									<cells>
-										<Input id="inputBox" value="{/results/title}" submit="onPressAdd"/>
-										<DatePicker id="dateBox" dateValue="{/results/date}"/>
-										<Button text="Add" press="onPressAdd"/>
+										<Input id="inputBox" value="{addFields>/Title}" submit="onPressAdd"/>
+										<DatePicker id="dateBox" dateValue="{addFields>/Duedate}"/>
+										<Button text="Add" press="onPressAdd" type="Emphasized" />
 									</cells>
 								</ColumnListItem>
 							</items>
@@ -35,13 +35,21 @@
 							<layoutData>
 							<l:GridData span="L12 M12 S12"/>
 						</layoutData>
-						<Table items="{myService/ToDoListSet}" width="auto">
+						<Table width="auto"
+							items="{
+								path: '/ToDoListSet'
+								}"
+							id="table">
 							<headerToolbar>
 								<Toolbar>
 									<Text text="To Do List"/>
+									<Switch change="onPressMyFilter" customTextOn="Mine" customTextOff="All" />
 								</Toolbar>
 							</headerToolbar>
 							<columns>
+								<Column>
+									<Text text="ID"/>
+								</Column>
 								<Column>
 									<Text text="Title"/>
 								</Column>
@@ -51,21 +59,33 @@
 								<Column>
 									<Text text="Due Date"/>
 								</Column>
+								<Column>
+									<Text text="Owner"/>
+								</Column>
 								<Column/>
 								<Column/>
 							</columns>
-							<items>
+							<items id="myItems">
 								<ColumnListItem>
 									<cells>
+										<Text text="{Id}"/>
 										<Text text="{Title}"/>
-										<Text text="{description}"/>
-										<Text text="{Duedate}"/>
+										<Text text="{Description}"/>
+										<Text text="{
+													path: 'Duedate',
+													type: 'sap.ui.model.type.Date',
+													formatOptions: {
+														style: 'long'
+													}
+												}"/>
+										<Text text="{Listname}"/>
 										<Button 
 												id="editButton"
 												text="Edit" 
 												press="onPressEdit" 
-												class="sapUiSmallMarginEnd"/>
-										<Button text="Remove" press="onPressRemove"/>
+												class="sapUiSmallMarginEnd"
+												icon="sap-icon://edit"/>
+										<Button text="Remove" press="onPressRemove" type="Reject" />
 									</cells>
 								</ColumnListItem>
 							</items>

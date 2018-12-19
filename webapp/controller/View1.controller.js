@@ -11,64 +11,61 @@ sap.ui.define([
 	return Controller.extend("testwebapptestWebApp.controller.View1", {
 
 		onInit: function() {
+			this.getOwnerComponent().getModel("dataStore");
+			
+			var today = new Date();
 
-			var that = this;
-			this.getView().getModel("myService").read("/ToDoListSet", {
-				success: function (data) {
-					var todoListModel = new JSONModel(data);
-					that.getView().setModel(todoListModel, "myItems");
-				},
-				error: function (oError) {
-					MessageToast.show("HELP!");
-				}
-			});
-
+			var initFields = {Title: "", Duedate: null};
+			var initAdds = new JSONModel(initFields);
+			this.getView().setModel(initAdds, "addFields");
 		},
 
-		onPressAdd: function(input) {
+		onPressMyFilter: function(oEvent) {
 
-			//Retrieving table data
-			var that = this;
-			this.getView().getModel("myService").read("/ToDoListSet", {
-				success: function (data) {
-					var todoListModel = new JSONModel(data);
-					that.getView().setModel(todoListModel, "myItems");
-				},
-				error: function (oError) {
-					MessageToast.show("HELP!");
-				}
-			});
+			var state = oEvent.getParameter("state");
+			var dataStore = this.getOwnerComponent().getModel("dataStore").getData();
 
-			var oFilter = [new Filter("Listname", FilterOperator.EQ, "nathan")];
-			var myList = that.getView().getModel("myItems");
+			var oData = this.getView().byId("table").getBinding("items");
+			var aFilter = [new Filter("Deleted", FilterOperator.EQ, "false")];
+			
+			if (state) {
+				aFilter.push(new Filter("Listname", FilterOperator.Contains, dataStore.Listname));
+				
+			} else {
+				aFilter.push(new Filter("Listname", FilterOperator.Contains, ""));
+			}
 
-			myList.results.filter(oFilter);
+			oData.filter(aFilter, FilterType.Application);
+		},
 
-			/*
+		onPressAdd: function(oEvent) {
+
+			var today = new Date();
+			var oData = this.getOwnerComponent().getModel();
+			var dataStore = this.getOwnerComponent().getModel("dataStore").getData();
+
 			//Retrieving input and removing it from input box
-			var newItem = this.getView().byId("inputBox").getValue();
+			var newItem = this.getView().getModel("addFields").getProperty("/Title");
 			if (newItem === "") {
 				newItem = "New Item";
 			}
-			this.getView().byId("inputBox").setValue("");
 
 			//Retrieving inputted date or generating today's date if blank, then removing it from the field
-			var newDate = this.getView().byId("dateBox").getValue();
-			if (newDate === "") {
-				var today = new Date();
-
-				newDate = today.getDate() + "/" + (today.getMonth() + 1) + "/" + today.getFullYear();
+			var newDate = this.getView().getModel("addFields").getProperty("/Duedate");
+			if (newDate === null) {
+				newDate = new Date();
 			}
-			this.getView().byId("dateBox").setValue("");
-
+			/*
 			//Generating Item Id
-			var dataLength = currentData.results.length;
+			var oUnfiltered = oData.filter([], FilterType.Application);
+
+			var dataLength = oData.getLength();
 
 			var i = 0;
 			var newId;
 
 			while (i < dataLength) {
-				if (currentData.results[i].id !== i) {
+				if (oData[i].id !== i) {
 					newId = i;
 					break;
 				}
@@ -78,20 +75,29 @@ sap.ui.define([
 			if (!newId) {
 				newId = i;
 			}
-
+			*/
 			//Generating new item for output array
 			var newBlob = {
-				id: newId,
-				title: newItem,
-				description: "Edit Description",
-				date: newDate
+				Title: newItem,
+				Description: "Edit Description",
+				Duedate: newDate,
+				Assignedto: "",
+				Listname: dataStore.Listname,
+				Createdby: "",
+				Completeddate: ""
 			};
 
 			//Pushing new item into the array - CREATE METHOD
-			currentData.results.push(newBlob);
-			currentModel.setData(currentData);
-			*/
-
+			var that = this;
+			this.getView().getModel().create("/ToDoListSet", newBlob, {
+				success: function () {
+					that.getView().getModel("addFields").setData({Title: "", Duedate: today});
+				}, 
+				error: function (oError) {
+					console.log(oError);
+				}
+			})
+			
 			//Refocusing user input to title box
 			this.getView().byId("inputBox").focus();
 		},
@@ -178,7 +184,11 @@ sap.ui.define([
 		},
 
 		onAfterRendering: function() {
-
+			
+			var oData = this.getView().byId("table").getBinding("items");
+			var aFilter = [new Filter("Deleted", FilterOperator.EQ, "false")];
+			oData.filter(aFilter, FilterType.Application);
+					
 		}
 	});
 });
