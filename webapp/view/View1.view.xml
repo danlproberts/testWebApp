@@ -18,7 +18,6 @@
 									<Text text="Due Date"/>
 								</Column>
 								<Column/>
-								<Column/>
 							</columns>
 							<items>
 								<ColumnListItem>
@@ -26,12 +25,11 @@
 										<Input id="inputBox" value="{addFields>/Title}" submit="onPressAdd"/>
 										<DatePicker id="dateBox" dateValue="{addFields>/Duedate}"/>
 										<Button text="Add" press="onPressAdd" type="Emphasized" />
-										<Button icon="sap-icon://message-information" press="onPressInfo"/>
 									</cells>
 								</ColumnListItem>
 							</items>
 						</Table>
-						<GenericTile class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" header="Live Info Update Box">
+						<GenericTile class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" header="Live Info Update Box" press="onPressInfo">
 							<TileContent>
 								<VBox>
 									<Label text="Input"/>			

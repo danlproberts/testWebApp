@@ -117,7 +117,7 @@ sap.ui.define([
 		returnEditFragment() {
 
 			if (!this._editFrag) {
-				this._editFrag = sap.ui.xmlfragment(this.getView().getId(), "testwebapptestWebApp.fragments.EditView1", this);
+				this._editFrag = sap.ui.xmlfragment(this.getView().getId(), "testwebapptestWebApp.view.fragments.EditView1", this);
 				this.getView().addDependent(this._editFrag, this);
 			}
 
@@ -128,7 +128,7 @@ sap.ui.define([
 		returnInfoFragment() {
 
 			if (!this._infoFrag) {
-				this._infoFrag = sap.ui.xmlfragment(this.getView().getId(), "testwebapptestWebApp.fragments.InfoView1", this);
+				this._infoFrag = sap.ui.xmlfragment(this.getView().getId(), "testwebapptestWebApp.view.fragments.InfoView1", this);
 				this.getView().addDependent(this._infoFrag, this);
 			}
 
