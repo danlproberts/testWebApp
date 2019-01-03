@@ -1,22 +1,33 @@
 <core:FragmentDefinition
-	controllerName="testwebapptestWebApp.controller.EditView1"
+	controllerName="testwebapptestWebApp.controller.View1"
 	xmlns="sap.m"
 	xmlns:core="sap.ui.core"
 	xmlns:mvc="sap.ui.core.mvc"
 	xmlns:l="sap.ui.layout">
-	<Dialog id="editDialog" title="{i18n>editFragmentTitle}" class="sapUiResponsiveMargin">
+	<Dialog id="editDialog" title="{i18n>editFragmentTitle}" class="sapUiResponsiveMargin" contentWidth="auto">
 		<l:Grid defaultSpan="L8 M10 S12">
+			<HBox>				
 			<VBox>
 				<layoutData>
 					<l:GridData indent="L2 M2 S1"/>
-				</layoutData>
+				</layoutData>				
 				<Label text="Edit Title"/>
-				<Input value="{fragModel>/title}" submit="editSaveFocus"/>
+				<Input value="{fragModel>/Title}" submit="editSaveFocus"/>
 				<Label text="Edit Description"/>
-				<Input value="{fragModel>/description}" submit="editSaveFocus"/>
+				<Input value="{fragModel>/Description}" submit="editSaveFocus"/>
 				<Label text="Edit Due Date"/>
-				<DatePicker value="{fragModel>/date}" change="editSaveFocus"/>
+				<DatePicker value="{fragModel>/Duedate}" change="editSaveFocus"/>
 			</VBox>
+			<VBox>
+				<layoutData>
+					<l:GridData indent="L8 M2 S1"/>
+				</layoutData>
+				<Label text="Owner"/>
+				<Input value="{fragModel>/Listname}" submit="editSaveFocus"/>
+				<Label text="Assinged To"/>
+				<Input value="{fragModel>/Assignedto}" submit="editSaveFocus"/>
+			</VBox>
+			</HBox>
 		</l:Grid>
 		<beginButton>
 			<Button id="editSave" text="Save" press="onPressSaveDialog"/>

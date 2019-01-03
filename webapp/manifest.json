@@ -20,6 +20,10 @@
 				"settings": {
 					"odataVersion": "2.0"
 				}
+			},
+			"dataStore": {
+				"uri": "config/dataStore.json",
+				"type": "JSON"
 			}
 		}
 	},
@@ -82,8 +86,8 @@
 				}
 			}			,
 			"dataStore": {
-				"type": "sap.ui.model.json.JSONModel",
-				"uri": "config/dataStore.json"
+				"dataSource": "dataStore",
+				"type": "sap.ui.model.json.JSONModel"
 			}
 		},
 		"resources": {

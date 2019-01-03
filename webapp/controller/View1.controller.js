@@ -3,46 +3,59 @@ sap.ui.define([
 	"sap/ui/model/json/JSONModel",
 	"sap/m/MessageToast",
 	"sap/ui/model/Filter",
-	"sap/ui/model/FilterOperator",
-	"sap/ui/model/FilterType"
-], function(Controller, JSONModel, MessageToast, Filter, FilterOperator, FilterType) {
+	"sap/ui/model/FilterOperator"
+], function(Controller, JSONModel, MessageToast, Filter, FilterOperator) {
 	"use strict";
 
 	return Controller.extend("testwebapptestWebApp.controller.View1", {
 
 		onInit: function() {
-			this.getOwnerComponent().getModel("dataStore");
-			
-			var today = new Date();
 
+			//Set Model for input fields
 			var initFields = {Title: "", Duedate: null};
 			var initAdds = new JSONModel(initFields);
 			this.getView().setModel(initAdds, "addFields");
+
+			//Set switch state model
+			var myStateModel = new JSONModel({
+				"state": true
+			})
+			this.getView().setModel(myStateModel, "myStateModel");
+
 		},
 
-		onPressMyFilter: function(oEvent) {
+		onBeforeRendering: function() {
 
-			var state = oEvent.getParameter("state");
-			var dataStore = this.getOwnerComponent().getModel("dataStore").getData();
+		},
 
-			var oData = this.getView().byId("table").getBinding("items");
-			var aFilter = [new Filter("Deleted", FilterOperator.EQ, "false")];
+		reApplyMyFilter: function(oEvent) {
+
+			//Gathering Switch State
+			var ftrSwtch = this.getView().getModel("myStateModel"),
+				state = ftrSwtch.getData().state;
 			
+			//Loading local dataStore.json
+			
+			var dsData = this.getView().getModel("dataStore").getData();
+
+			var aFilter = [new Filter("Deleted", FilterOperator.EQ, "false")];
+		
 			if (state) {
-				aFilter.push(new Filter("Listname", FilterOperator.Contains, dataStore.Listname));
+				aFilter.push(new Filter("Listname", FilterOperator.Contains, dsData.Listname));
 				
 			} else {
-				aFilter.push(new Filter("Listname", FilterOperator.Contains, ""));
+
 			}
 
-			oData.filter(aFilter, FilterType.Application);
+			this.refreshTable(aFilter);
+	
 		},
 
 		onPressAdd: function(oEvent) {
 
 			var today = new Date();
-			var oData = this.getOwnerComponent().getModel();
-			var dataStore = this.getOwnerComponent().getModel("dataStore").getData();
+			var oData = this.getView().getModel();
+			var dataStore = this.getView().getModel("dataStore").getData();
 
 			//Retrieving input and removing it from input box
 			var newItem = this.getView().getModel("addFields").getProperty("/Title");
@@ -55,44 +68,22 @@ sap.ui.define([
 			if (newDate === null) {
 				newDate = new Date();
 			}
-			/*
-			//Generating Item Id
-			var oUnfiltered = oData.filter([], FilterType.Application);
-
-			var dataLength = oData.getLength();
-
-			var i = 0;
-			var newId;
-
-			while (i < dataLength) {
-				if (oData[i].id !== i) {
-					newId = i;
-					break;
-				}
-				i++;
-			}
-
-			if (!newId) {
-				newId = i;
-			}
-			*/
+						
 			//Generating new item for output array
 			var newBlob = {
 				Title: newItem,
 				Description: "Edit Description",
 				Duedate: newDate,
 				Assignedto: "",
-				Listname: dataStore.Listname,
-				Createdby: "",
-				Completeddate: ""
+				Listname: dataStore.Listname
 			};
 
 			//Pushing new item into the array - CREATE METHOD
-			var that = this;
 			this.getView().getModel().create("/ToDoListSet", newBlob, {
 				success: function () {
-					that.getView().getModel("addFields").setData({Title: "", Duedate: today});
-				}, 
+					this.getView().getModel("addFields").setData({Title: "", Duedate: today});		
+					this.reApplyMyFilter();
+				}.bind(this), 
 				error: function (oError) {
 					console.log(oError);
 				}
@@ -105,30 +96,46 @@ sap.ui.define([
 		onPressEdit: function(oEvent) {
 
 			//Retrieving row on button location
-			var eventBC = oEvent.getSource().getBindingContext();
-			var line = eventBC.getPath().substr(-1);
+			var eventBC = oEvent.getSource().getBindingContext("myItems");
+			var sObject = eventBC.getObject();
 
-			//Retrieving table data
-			var oView = this.getView();
-			var currentModel = oView.getModel();
-			var itemData = currentModel.getData().results[line];
+			//Initilise fragment
+			this.returnEditFragment();
 
-			//var titleBox_Dialog = this.getView().byId("editTitle_input").setValue(itemData.title);
+			var fragData = new JSONModel(sObject);
+			this._editFrag.setModel(fragData, "fragModel");
+			this._editFrag.open();
+		},
 
-			var oDialog = oView.byId("editDialog");
+		onPressInfo: function(oEvent) {
 
-			if (!oDialog) {
-				oDialog = sap.ui.xmlfragment(oView.getId(), "testwebapptestWebApp.fragments.EditView1", this);
-				oView.addDependent(oDialog, this);
-			}
+			this.returnInfoFragment();
 			
-			//Update Method here!
-			var fragData = new JSONModel(itemData);
-			oDialog.setModel(fragData, "fragModel");
-			oDialog.open();
-
+			this._infoFrag.open();
 		},
 		
+		returnEditFragment() {
+
+			if (!this._editFrag) {
+				this._editFrag = sap.ui.xmlfragment(this.getView().getId(), "testwebapptestWebApp.fragments.EditView1", this);
+				this.getView().addDependent(this._editFrag, this);
+			}
+
+			return this._editFrag
+
+		},
+
+		returnInfoFragment() {
+
+			if (!this._infoFrag) {
+				this._infoFrag = sap.ui.xmlfragment(this.getView().getId(), "testwebapptestWebApp.fragments.InfoView1", this);
+				this.getView().addDependent(this._infoFrag, this);
+			}
+
+			return this._infoFrag
+
+		},
+
 		handelPriority: function(dueDate) {
 			var today = new Date("M/D/YYYY");
 			if (dueDate > today) {
@@ -138,14 +145,23 @@ sap.ui.define([
 		},
 
 		onPressSaveDialog: function() {
+			
+			var oDialog = this._editFrag,
+				oModel = oDialog.getModel("fragModel"),
+				oData = oModel.getData(),
+				line = oData.Id;
 
-			var oView = this.getView();
+			//Update Method here!
+			this.getView().getModel().update("/ToDoListSet(" + line + ")", oData, {
+				success: function () {		
+					this.reApplyMyFilter();
+				}.bind(this), 
+				error: function (oError) {
+					console.log(oError);
+				}
+			})
 
-			var oData = oView.getModel().getData();
-			oView.getModel().setData(oData);
-
-			var oDialog = oView.byId("editDialog");
-			oDialog.close();
+			//oDialog.close();
 
 			var msg = "Item Saved";
 			MessageToast.show(msg);
@@ -154,40 +170,86 @@ sap.ui.define([
 
 		onPressCloseDialog: function() {
 
-			var oView = this.getView();
+			if (this._editFrag) {
+				this._editFrag.close();
+			}
 
-			var oDialog = oView.byId("editDialog");
-			oDialog.close();
+			if (this._infoFrag) {
+				this._infoFrag.close();
+			}
 		},
 
 		onPressRemove: function(oEvent) {
 
 			//Retrieving row on button location
-			var eventBC = oEvent.getSource().getBindingContext();
-			var line = eventBC.getPath().substr(-1);
-
-			//Retrieving table data
-			var currentModel = this.getView().getModel();
-			var currentData = currentModel.getData();
+			var eventBC = oEvent.getSource().getBindingContext("myItems");
+			var sObject = eventBC.getObject();
+			var line = sObject.Id;
 
 			//Removing row from table data and setting at model - REMOVE method here!
-			currentData.results.splice(line, 1);
-			currentModel.setData(currentData);
-
-			var msg = "Item Removed";
+			this.getView().getModel().remove("/ToDoListSet(" + line + ")", {
+				success: function () {		
+					this.reApplyMyFilter();
+				}.bind(this), 
+				error: function (oError) {
+					console.log(oError);
+				}
+			})
+			
+			var msg = "Line " + line + " Removed";
 			MessageToast.show(msg);
-
+			
 		},
 
 		editSaveFocus: function() {
 			this.getView().byId("editSave").focus();
 		},
 
-		onAfterRendering: function() {
+		refreshTable: function(filter=[new Filter("Deleted", FilterOperator.EQ, "false")]) {			
+
+			this.getView().getModel().read("/ToDoListSet", {
+				filters : filter,
+				success: function(data){
+					console.log(data);
+					var myModel = new JSONModel(data);
+					this.getView().setModel(myModel, "myItems");
+					
+				}.bind(this),
+				error: function(oError) {
+					console.log(oError);
+				}
+			})
 			
-			var oData = this.getView().byId("table").getBinding("items");
-			var aFilter = [new Filter("Deleted", FilterOperator.EQ, "false")];
-			oData.filter(aFilter, FilterType.Application);
+		},
+
+		firstTimeFilter: function() {
+
+			//Gathering Switch State
+			var ftrSwtch = this.getView().getModel("myStateModel"),
+				state = ftrSwtch.getData().state;
+
+			//Loading local dataStore.json
+			this.getOwnerComponent().getModel("dataStore").attachRequestCompleted(function(oEvent) {
+				var dsData = oEvent.getSource().getData();
+
+				var aFilter = [new Filter("Deleted", FilterOperator.EQ, "false")];
+			
+				if (state) {
+					aFilter.push(new Filter("Listname", FilterOperator.Contains, dsData.Listname));
+					
+				} else {
+
+				}
+
+				this.refreshTable(aFilter);
+
+			}.bind(this));
+
+		},
+
+		onAfterRendering: function() {
+
+			this.firstTimeFilter();
 					
 		}
 	});

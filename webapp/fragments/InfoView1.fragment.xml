@@ -1,0 +1,27 @@
+<core:FragmentDefinition
+	controllerName="testwebapptestWebApp.controller.View1"
+	xmlns="sap.m"
+	xmlns:core="sap.ui.core"
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns:l="sap.ui.layout">
+	<Dialog id="infoDialog" title="{i18n>infoFragmentTitle}" class="sapUiResponsiveMargin">
+		<l:Grid defaultSpan="L8 M10 S12" class="sapUiForceWidthAuto">
+			<HBox>
+				<layoutData>
+					<l:GridData indent="L2 M2 S1"/>
+				</layoutData>                
+                <VBox>
+                <Label text="Input"/>			
+				<Text text="{addFields>/Title}"/>
+                </VBox>
+                <VBox>
+                <Label text="State"/>			
+				<Text text="{myStateModel>/state}"/>
+                </VBox>
+            </HBox>
+		</l:Grid>
+		<endButton>
+			<Button text="Close" press="onPressCloseDialog"/>
+		</endButton>
+	</Dialog>
+</core:FragmentDefinition>
