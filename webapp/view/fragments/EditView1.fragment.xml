@@ -4,30 +4,29 @@
 	xmlns:core="sap.ui.core"
 	xmlns:mvc="sap.ui.core.mvc"
 	xmlns:l="sap.ui.layout">
-	<Dialog id="editDialog" title="{i18n>editFragmentTitle}" class="sapUiResponsiveMargin" contentWidth="auto">
-		<l:Grid defaultSpan="L8 M10 S12">
-			<HBox>				
-			<VBox>
+	<Dialog id="editDialog" title="{i18n>editFragmentTitle}" class="sapUiSmallMargin">
+		<l:Grid defaultSpan="L10 M10 S10">
+			<VBox class="sapUiTinyMargin">
 				<layoutData>
-					<l:GridData indent="L2 M2 S1"/>
+					<l:GridData indent="L1 M2 S1"/>
 				</layoutData>				
 				<Label text="Edit Title"/>
-				<Input value="{fragModel>/Title}" submit="editSaveFocus"/>
+				<Input value="{fragModel>/Title}" submit="editSaveFocus" placeholder="Title"/>
 				<Label text="Edit Description"/>
-				<Input value="{fragModel>/Description}" submit="editSaveFocus"/>
+				<Input value="{fragModel>/Description}" submit="editSaveFocus" placeholder="Description"/>
 				<Label text="Edit Due Date"/>
-				<DatePicker value="{fragModel>/Duedate}" change="editSaveFocus"/>
-			</VBox>
-			<VBox>
-				<layoutData>
-					<l:GridData indent="L8 M2 S1"/>
-				</layoutData>
+				<DatePicker value="{
+						path: 'fragModel>/Duedate',
+						type: 'sap.ui.model.type.Date',
+						formatOptions: {
+							style: 'short'
+						}
+					}" change="editSaveFocus" placeholder="Due Date"/>
 				<Label text="Owner"/>
-				<Input value="{fragModel>/Listname}" submit="editSaveFocus"/>
+				<Input value="{fragModel>/Listname}" submit="editSaveFocus" placeholder="Owner of Item"/>
 				<Label text="Assinged To"/>
-				<Input value="{fragModel>/Assignedto}" submit="editSaveFocus"/>
+				<Input value="{fragModel>/Assignedto}" submit="editSaveFocus" placeholder="Assinged To"/>
 			</VBox>
-			</HBox>
 		</l:Grid>
 		<beginButton>
 			<Button id="editSave" text="Save" press="onPressSaveDialog"/>

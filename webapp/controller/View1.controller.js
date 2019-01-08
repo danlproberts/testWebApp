@@ -1,34 +1,45 @@
 sap.ui.define([
+	"sap/ui/core/UIComponent",
 	"sap/ui/core/mvc/Controller",
 	"sap/ui/model/json/JSONModel",
+	"sap/m/Dialog",
 	"sap/m/MessageToast",
+	"sap/m/Button",
 	"sap/ui/model/Filter",
-	"sap/ui/model/FilterOperator"
-], function(Controller, JSONModel, MessageToast, Filter, FilterOperator) {
+	"sap/ui/model/Sorter",
+	"sap/ui/model/FilterOperator",
+	"testwebapptestWebApp/util/usefulFunctions"
+], function(UIComponent, Controller, JSONModel, Dialog, MessageToast, Button, Filter, Sorter, FilterOperator, usefulFunctions) {
 	"use strict";
 
 	return Controller.extend("testwebapptestWebApp.controller.View1", {
 
 		onInit: function() {
+            UIComponent.getRouterFor(this).getRoute("main").attachMatched(this._onRouteMatched, this);
+        },
 
-			//Set Model for input fields
+        _onRouteMatched: function(oEvent) {
+
+            //Set Model for input fields
 			var initFields = {Title: "", Duedate: null};
 			var initAdds = new JSONModel(initFields);
 			this.getView().setModel(initAdds, "addFields");
 
 			//Set switch state model
 			var myStateModel = new JSONModel({
-				"state": true
+				"state": true,
+				"creator": "Daniel Roberts"
 			})
 			this.getView().setModel(myStateModel, "myStateModel");
 
+			this.firstTimeFilter();
 		},
 
 		onBeforeRendering: function() {
 
 		},
 
-		reApplyMyFilter: function(oEvent) {
+		reApplyMyFilter: function(sorter=[]) {
 
 			//Gathering Switch State
 			var ftrSwtch = this.getView().getModel("myStateModel"),
@@ -41,21 +52,53 @@ sap.ui.define([
 			var aFilter = [new Filter("Deleted", FilterOperator.EQ, "false")];
 		
 			if (state) {
-				aFilter.push(new Filter("Listname", FilterOperator.Contains, dsData.Listname));
+				aFilter.push(new Filter("Listname", FilterOperator.EQ, dsData.Listname));
 				
 			} else {
 
 			}
 
-			this.refreshTable(aFilter);
+			this.refreshTable(aFilter, sorter);
 	
+		},
+
+		refreshTable: function(filter=[new Filter("Deleted", FilterOperator.EQ, "false")], sorter=[]) {			
+
+			this.getView().getModel().read(usefulFunctions.returnPath(), {
+				sorters: sorter,
+				filters : filter,
+				success: function(data){
+					console.log(data);
+					var myModel = new JSONModel(data);
+					this.getView().setModel(myModel, "myItems");
+					
+				}.bind(this),
+				error: function(oError) {
+					console.log(oError);
+				}
+			})		
+
+		},
+
+		navToTaskDetails: function(oEvent){
+
+			//Retrieving row on button location
+			var eventBC = oEvent.getSource().getBindingContext("myItems"),
+				sObject = eventBC.getObject(),
+				itemId = sObject.Id;
+
+			UIComponent.getRouterFor(this).navTo("taskDetails", {
+				"itemId" : itemId,
+				"model" : sObject
+			})
 		},
 
 		onPressAdd: function(oEvent) {
 
-			var today = new Date();
-			var oData = this.getView().getModel();
-			var dataStore = this.getView().getModel("dataStore").getData();
+			var today = new Date(),
+				oData = this.getView().getModel(),
+				dataStore = this.getView().getModel("dataStore").getData(),
+				itemCreator = this.getView().getModel("myStateModel").getData();
 
 			//Retrieving input and removing it from input box
 			var newItem = this.getView().getModel("addFields").getProperty("/Title");
@@ -75,13 +118,14 @@ sap.ui.define([
 				Description: "Edit Description",
 				Duedate: newDate,
 				Assignedto: "",
-				Listname: dataStore.Listname
+				Listname: dataStore.Listname,
+				Createdby: itemCreator.creator
 			};
 
 			//Pushing new item into the array - CREATE METHOD
-			this.getView().getModel().create("/ToDoListSet", newBlob, {
+			this.getView().getModel().create(usefulFunctions.returnPath(), newBlob, {
 				success: function () {
-					this.getView().getModel("addFields").setData({Title: "", Duedate: today});		
+					this.getView().getModel("addFields").setData({Title: "", Duedate: null});		
 					this.reApplyMyFilter();
 				}.bind(this), 
 				error: function (oError) {
@@ -136,6 +180,132 @@ sap.ui.define([
 
 		},
 
+		returnSortFragment() {
+
+			if (!this._sortFrag) {
+				this._sortFrag = sap.ui.xmlfragment(this.getView().getId(), "testwebapptestWebApp.view.fragments.SortView1", this);
+				this.getView().addDependent(this._sortFrag, this);
+			}
+
+			return this._sortFrag
+
+		},
+
+		onPressSort: function(oEvent) {
+
+			this.returnSortFragment()
+
+			if (!this._sortFrag.getModel("sortModel")) {
+
+				var sortData = new JSONModel({
+					"sorting" : false,
+					"sortType": "asc",
+					"sortField": "Title",
+					"sortBool": false
+				})
+
+				this._sortFrag.setModel(sortData, "sortModel")
+
+				console.log("Model Created!")
+
+			}
+			
+			
+			this._sortFrag.open()		
+
+		},
+
+		onSortFieldChange: function(oEvent) {
+			
+			var sortData = this._sortFrag.getModel("sortModel").getData()
+
+			sortData.sortField = oEvent.getParameter("item").getProperty("key")
+
+		},
+
+		onSortTypeChange: function(oEvent) {
+			
+			var sortData = this._sortFrag.getModel("sortModel").getData()
+
+			sortData.sortType = oEvent.getParameter("item").getProperty("key")
+
+		},
+
+		onPressSortSaveGW: function() {
+			
+			var oDialog = this._sortFrag,
+				oModel = oDialog.getModel("sortModel"),
+				sortData = oModel.getData();
+
+			sortData.sortBool = (sortData.sortType === "desc") ? true : false;
+
+			var sortSorter = [new Sorter(sortData.sortField, sortData.sortBool)];
+
+			this.reApplyMyFilter(sortSorter);
+
+			oDialog.close();
+
+		},
+
+		onPressSortSaveLocal: function() {
+			
+			var oDialog = this._sortFrag,
+				oModel = oDialog.getModel("sortModel"),
+				sortData = oModel.getData();
+
+			sortData.sortBool = (sortData.sortType === "desc") ? true : false;
+
+			var oData = this.getView().getModel("myItems").getData();
+
+			var sortedData = this.returnSortTableItems(oData, sortData.sortField, sortData.sortBool);
+
+			this.getView().getModel("myItems").setData(sortedData);
+
+			oDialog.close();
+
+		},
+
+		returnSortTableItems: function(data, sortField, sortDesc=false) {
+			
+			var sortField = sortField
+
+			data.results.sort(			
+
+				function(a, b) {
+					if (!sortDesc) {
+						
+						if (typeof(a[sortField]) === "string") {
+
+							return a[sortField].localeCompare(b[sortField])
+
+						} else {
+
+							return a[sortField] - b[sortField];
+
+						}
+						
+						
+					} else {
+
+						if (typeof(a[sortField]) === "string") {
+
+							return b[sortField].localeCompare(a[sortField])
+
+						} else {
+
+							return b[sortField] - a[sortField];
+
+						}
+						
+					}
+				}
+
+			);
+
+			return data
+
+		},
+
 		handelPriority: function(dueDate) {
 			var today = new Date("M/D/YYYY");
 			if (dueDate > today) {
@@ -152,7 +322,7 @@ sap.ui.define([
 				line = oData.Id;
 
 			//Update Method here!
-			this.getView().getModel().update("/ToDoListSet(" + line + ")", oData, {
+			this.getView().getModel().update(usefulFunctions.returnPath(line), oData, {
 				success: function () {		
 					this.reApplyMyFilter();
 				}.bind(this), 
@@ -165,7 +335,6 @@ sap.ui.define([
 
 			var msg = "Item Saved";
 			MessageToast.show(msg);
-
 		},
 
 		onPressCloseDialog: function() {
@@ -177,6 +346,11 @@ sap.ui.define([
 			if (this._infoFrag) {
 				this._infoFrag.close();
 			}
+
+			if (this._sortFrag) {
+				this._sortFrag.close();
+			}
+			
 		},
 
 		onPressRemove: function(oEvent) {
@@ -184,10 +358,33 @@ sap.ui.define([
 			//Retrieving row on button location
 			var eventBC = oEvent.getSource().getBindingContext("myItems");
 			var sObject = eventBC.getObject();
+
+			//Confirm removal
+			var oSource = oEvent.getSource();
+			
+			if (oSource.getProperty("type") === "Reject") {
+
+				oSource.setProperty("text", "Confirm?");
+				oSource.setProperty("type", "Accept");				
+
+			} else {
+
+				this.removeMain(sObject);
+
+				oSource.setProperty("text", "Remove");
+				oSource.setProperty("type", "Reject");
+
+			}
+
+		},
+
+		removeMain: function(sObject) {
+
+			
 			var line = sObject.Id;
 
 			//Removing row from table data and setting at model - REMOVE method here!
-			this.getView().getModel().remove("/ToDoListSet(" + line + ")", {
+			this.getView().getModel().remove(usefulFunctions.returnPath(line), {
 				success: function () {		
 					this.reApplyMyFilter();
 				}.bind(this), 
@@ -195,31 +392,14 @@ sap.ui.define([
 					console.log(oError);
 				}
 			})
-			
+
 			var msg = "Line " + line + " Removed";
 			MessageToast.show(msg);
-			
+
 		},
 
 		editSaveFocus: function() {
 			this.getView().byId("editSave").focus();
-		},
-
-		refreshTable: function(filter=[new Filter("Deleted", FilterOperator.EQ, "false")]) {			
-
-			this.getView().getModel().read("/ToDoListSet", {
-				filters : filter,
-				success: function(data){
-					console.log(data);
-					var myModel = new JSONModel(data);
-					this.getView().setModel(myModel, "myItems");
-					
-				}.bind(this),
-				error: function(oError) {
-					console.log(oError);
-				}
-			})
-			
 		},
 
 		firstTimeFilter: function() {
@@ -235,7 +415,7 @@ sap.ui.define([
 				var aFilter = [new Filter("Deleted", FilterOperator.EQ, "false")];
 			
 				if (state) {
-					aFilter.push(new Filter("Listname", FilterOperator.Contains, dsData.Listname));
+					aFilter.push(new Filter("Listname", FilterOperator.EQ, dsData.Listname));
 					
 				} else {
 
@@ -248,8 +428,6 @@ sap.ui.define([
 		},
 
 		onAfterRendering: function() {
-
-			this.firstTimeFilter();
 					
 		}
 	});

@@ -51,9 +51,44 @@
 
 	"sap.ui5": {
 		"rootView": {
-			"viewName": "testwebapptestWebApp.view.View1",
+			"viewName": "testwebapptestWebApp.view.app",
 			"type": "XML"
 		},
+		"routing": {
+            "config": {
+                "routerClass": "sap.m.routing.Router",
+                "viewType": "XML",
+                "viewPath": "testwebapptestWebApp.view",
+                "controlId": "app",
+                "controlAggregation": "pages",
+                "bypassed": {
+                    "target": "notFound"
+                }
+            },
+            "routes": [{
+                "pattern": "",
+                "name": "main",
+                "target": "main"
+            }, {
+                "pattern": "detail/{itemId}",
+                "name": "taskDetails",
+                "target": "taskDetails"
+            }],
+            "targets": {
+                "main": {
+                    "viewName": "View1",
+                    "viewId": "View1",
+                    "viewLevel": 1
+                },
+                "taskDetails": {
+                    "viewName": "taskDetails",
+                    "viewId": "taskDetails",
+                    "viewLevel": 2,
+                    "transition": "slide"
+                }
+            }
+        },
+
 		"dependencies": {
 			"minUI5Version": "1.30.0",
 			"libs": {

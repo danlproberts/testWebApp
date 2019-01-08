@@ -1,0 +1,49 @@
+<mvc:View controllerName="testwebapptestWebApp.controller.taskDetails" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:mvc="sap.ui.core.mvc"
+	displayBlock="true" xmlns="sap.m" xmlns:l="sap.ui.layout" xmlns:core="sap.ui.core">
+	<App>
+		<pages>
+			<Page title="{dataStore>/Listname}'s {i18n>title}"            
+                showNavButton="true"
+                navButtonPress="onNavBack">
+				<content>
+                <l:Grid defaultSpan="L10 M10 S10">
+			<VBox class="sapUiTinyMargin">
+				<layoutData>
+					<l:GridData indent="L1 M2 S1"/>
+				</layoutData>
+                <Label text="ID"/>
+				<Text text="{itemModel>/Id}"/>				
+				<Label text="Title"/>
+				<Text text="{itemModel>/Title}"/>
+				<Label text="Description"/>
+				<Text text="{itemModel>/Description}"/>
+				<Label text="Due Date"/>
+				<Text text="{
+						path: 'itemModel>/Duedate',
+						type: 'sap.ui.model.type.Date',
+						formatOptions: {
+							style: 'short'
+						}
+					}"/>
+				<Label text="Owner"/>
+				<Text text="{itemModel>/Listname}"/>
+				<Label text="Assinged To"/>
+				<Text text="{itemModel>/Assignedto}"/>
+                <Label text="Created By"/>
+				<Text text="{itemModel>/Createdby}"/>
+                <Label text="Completed Date"/>
+                <Text text="{
+						path: 'itemModel>/Completeddate',
+						type: 'sap.ui.model.type.Date',
+						formatOptions: {
+							style: 'short'
+						}
+					}"/>
+
+			</VBox>
+		</l:Grid>
+				</content>
+			</Page>
+		</pages>
+	</App>
+</mvc:View>

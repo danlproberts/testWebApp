@@ -1,0 +1,39 @@
+<core:FragmentDefinition
+	controllerName="testwebapptestWebApp.controller.View1"
+	xmlns="sap.m"
+	xmlns:core="sap.ui.core"
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns:l="sap.ui.layout">
+	<Dialog id="sortDialog" title="{i18n>sortFragmentTitle}"  class="sapUiSmallMargin">
+		<l:Grid defaultSpan="L8 M10 S12" class="sapUiForceWidthAuto">
+			<HBox class="sapUiTinyMargin">
+				<layoutData>
+					<l:GridData indent="L1 M1 S1"/>
+				</layoutData>
+                <VBox>
+                <Label text="Sort Field"/>
+                <SegmentedButton selectedKey="{sortModel>/sortField}" class="sapUiSmallMarginBottom" selectionChange="onSortFieldChange"> 
+					<items>
+						<SegmentedButtonItem text="Title" key="Title" />
+						<SegmentedButtonItem text="Due Date" key="Duedate" />
+						<SegmentedButtonItem text="Owner" key="Listname" />
+					</items>
+				</SegmentedButton>
+                <Label text="Sort Direction"/>
+                <SegmentedButton selectedKey="{sortModel>/sortType}" class="sapUiSmallMarginBottom" selectionChange="onSortTypeChange"> 
+					<items>
+						<SegmentedButtonItem text="Ascending" key="asc" />
+						<SegmentedButtonItem text="Descending" key="desc" />
+					</items>
+				</SegmentedButton>
+                </VBox>       
+            </HBox>
+		</l:Grid>
+        <beginButton>
+			<Button id="sortSave" text="Save" press="onPressSortSaveLocal"/>
+		</beginButton>
+		<endButton>
+			<Button text="Close" press="onPressCloseDialog"/>
+		</endButton>
+	</Dialog>
+</core:FragmentDefinition>
