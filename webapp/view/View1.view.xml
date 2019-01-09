@@ -44,12 +44,13 @@
 								<layoutData>
 								<l:GridData span="L12 M12 S12"/>
 							</layoutData>
-							<Table width="auto"
+							<Table id="mainTable" 
+								width="auto"
 								items="{myItems>/results}"
-								id="table">
+								ariaLabelledBy="title">
 								<headerToolbar>
 									<Toolbar>
-										<Text text="To Do List" level="h2"/>
+										<Title text="To Do List" level="H2"/>
 										<Button icon="sap-icon://refresh" press="firstTimeFilter"/>
 										<Label text="List Name: "/>
 										<Input width="10%" value="{dataStore>/Listname}" submit="reApplyMyFilter"/>
@@ -59,19 +60,19 @@
 									</Toolbar>
 								</headerToolbar>
 								<columns>
-									<Column>
-										<Text text="ID"/>
+									<Column id="id">
+										<Text text="ID" />
 									</Column>
-									<Column>
+									<Column id="title">
 										<Text text="Title"/>
 									</Column>
-									<Column>
+									<Column id="description">
 										<Text text="Description"/>
 									</Column>
-									<Column>
-										<Text text="Due Date"/>
+									<Column id="duedate">
+										<Text text="Due Date" />
 									</Column>
-									<Column>
+									<Column id="listname">
 										<Text text="Owner"/>
 									</Column>
 									<Column/>

@@ -14,9 +14,9 @@
                 <Label text="Sort Field"/>
                 <SegmentedButton selectedKey="{sortModel>/sortField}" class="sapUiSmallMarginBottom" selectionChange="onSortFieldChange"> 
 					<items>
-						<SegmentedButtonItem text="Title" key="Title" />
-						<SegmentedButtonItem text="Due Date" key="Duedate" />
-						<SegmentedButtonItem text="Owner" key="Listname" />
+						<SegmentedButtonItem text="Title" key="title" />
+						<SegmentedButtonItem text="Due Date" key="duedate" />
+						<SegmentedButtonItem text="Owner" key="listname" />
 					</items>
 				</SegmentedButton>
                 <Label text="Sort Direction"/>

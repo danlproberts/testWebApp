@@ -2,14 +2,13 @@ sap.ui.define([
 	"sap/ui/core/UIComponent",
 	"sap/ui/core/mvc/Controller",
 	"sap/ui/model/json/JSONModel",
-	"sap/m/Dialog",
 	"sap/m/MessageToast",
-	"sap/m/Button",
 	"sap/ui/model/Filter",
 	"sap/ui/model/Sorter",
+	"sap/ui/table/SortOrder",
 	"sap/ui/model/FilterOperator",
 	"testwebapptestWebApp/util/usefulFunctions"
-], function(UIComponent, Controller, JSONModel, Dialog, MessageToast, Button, Filter, Sorter, FilterOperator, usefulFunctions) {
+], function(UIComponent, Controller, JSONModel, MessageToast, Filter, Sorter, SortOrder, FilterOperator, usefulFunctions) {
 	"use strict";
 
 	return Controller.extend("testwebapptestWebApp.controller.View1", {
@@ -200,7 +199,7 @@ sap.ui.define([
 				var sortData = new JSONModel({
 					"sorting" : false,
 					"sortType": "asc",
-					"sortField": "Title",
+					"sortField": "title",
 					"sortBool": false
 				})
 
@@ -255,11 +254,16 @@ sap.ui.define([
 
 			sortData.sortBool = (sortData.sortType === "desc") ? true : false;
 
-			var oData = this.getView().getModel("myItems").getData();
+			var oTable = this.getView().byId("mainTable");
+			var oColumn = this.getView().byId(sortData.sortField)
 
-			var sortedData = this.returnSortTableItems(oData, sortData.sortField, sortData.sortBool);
+			var oBinding = oTable.getBinding("items"),
+			aSorters = [];
 
-			this.getView().getModel("myItems").setData(sortedData);
+			aSorters.push(new Sorter(sortData.sortField, sortData.sortBool));
+
+			// apply the selected sort and group settings
+			oBinding.sort(aSorters);
 
 			oDialog.close();
 
@@ -269,8 +273,7 @@ sap.ui.define([
 			
 			var sortField = sortField
 
-			data.results.sort(			
-
+			data.results.sort(
 				function(a, b) {
 					if (!sortDesc) {
 						
@@ -282,9 +285,7 @@ sap.ui.define([
 
 							return a[sortField] - b[sortField];
 
-						}
-						
-						
+						}						
 					} else {
 
 						if (typeof(a[sortField]) === "string") {
@@ -295,11 +296,9 @@ sap.ui.define([
 
 							return b[sortField] - a[sortField];
 
-						}
-						
+						}						
 					}
 				}
-
 			);
 
 			return data
